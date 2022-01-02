@@ -1,3 +1,6 @@
+import os
+
+
 class Config():
     """基础数据库配置"""
     HOST = '192.168.0.121'
@@ -24,12 +27,18 @@ class DevelopmentMode(Config):
     # 自动加载模板
     TEMPLATES_AUTO_RELOAD = True
 
+    # 秘钥
+    SECRET_KEY = os.urandom(12)
+
 
 class ProductionModels(Config):
     """生产模式下的config配置"""
 
     # 解决中文乱码
     JSON_AS_ASCII = False
+
+    # 秘钥
+    SECRET_KEY = os.urandom(12)
 
 
 class TestPattern(Config):
@@ -44,5 +53,6 @@ class TestPattern(Config):
 configDict = {
     "development": DevelopmentMode,
     "production": ProductionModels,
-    "test": TestPattern
+    "test": TestPattern,
+
 }

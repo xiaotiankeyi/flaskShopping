@@ -5,6 +5,7 @@ from flask import request
 from flask_restful import Resource
 from projectCode.utils.common import errorRetult
 import re
+from projectCode.utils.token_tool import createAutnToken, loginValidation
 """编辑蓝图"""
 
 
@@ -23,7 +24,8 @@ def login():
         user = models.User.query.filter_by(name=name).first()
         if user:
             if user.check_password(pwd):
-                return errorRetult(message="登录成功")
+                token = createAutnToken(IDvalue=user.id, timeValidity=1000)
+                return errorRetult(message="登录成功", data={"token": token})
     return errorRetult(status=20001)
 
 
@@ -73,3 +75,9 @@ class Register(Resource):
 
 
 registerApi.add_resource(Register, "/register/", endpoint="register")
+
+
+@userFunc.route("/token/", methods=['get'])
+@loginValidation
+def TestToken():
+    return errorRetult(10000)
