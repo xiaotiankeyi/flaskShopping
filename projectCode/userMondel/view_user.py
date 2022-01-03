@@ -1,7 +1,7 @@
 from projectCode.userMondel import userFunc, registerApi
 from projectCode import db
 from projectCode import models
-from flask import request
+from flask import request, jsonify
 from flask_restful import Resource
 from projectCode.utils.common import errorRetult
 import re
@@ -24,7 +24,7 @@ def login():
         user = models.User.query.filter_by(name=name).first()
         if user:
             if user.check_password(pwd):
-                token = createAutnToken(IDvalue=user.id, timeValidity=1000)
+                token = createAutnToken(IDvalue=user.id)
                 return errorRetult(message="登录成功", data={"token": token})
     return errorRetult(status=20001)
 
