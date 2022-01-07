@@ -18,8 +18,11 @@ def create(config_Key):
     db.init_app(app=app)
 
     """蓝图注册必须是app对象和db对象创建后初始化完成后才注册"""
-    from projectCode.userMondel import userFunc
+    from projectCode.user import userFunc
     app.register_blueprint(userFunc)
+
+    from projectCode.menu import menuFunc
+    app.register_blueprint(menuFunc)
 
     @app.route('/')
     def hello_world():

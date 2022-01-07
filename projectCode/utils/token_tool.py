@@ -24,15 +24,15 @@ def tokenTime():
     nowTime = datetime.strptime(nowTime, "%Y-%m-%d %H:%M:%S")
 
     lastTime = (ToTime - nowTime).total_seconds()
-    return int(lastTime)
+    return lastTime
 
 
-def createAutnToken(IDvalue, timeValidity=tokenTime):
+def createAutnToken(IDvalue):
     """生成token,IDvalue用户id,timeValidity有效期"""
     condingObj = Serializer(
-        current_app.config['SECRET_KEY'], timeValidity)
+        current_app.config['SECRET_KEY'], 100)
 
-    return condingObj.dumps({"id": str(IDvalue)}).decode()
+    return condingObj.dumps({"id": IDvalue}).decode()
 
 
 def decodeAutnToken(tokenValue):

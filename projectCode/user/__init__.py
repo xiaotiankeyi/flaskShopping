@@ -7,4 +7,4 @@ registerApi = Api(userFunc)
 
 
 """引用视图,让视图起作用"""
-from projectCode.userMondel.view_user import login
+from projectCode.user import view_user

@@ -1,8 +1,10 @@
-from projectCode.userMondel import userFunc, registerApi
+from sqlalchemy.orm import query
+from projectCode.user import userFunc, registerApi
 from projectCode import db
 from projectCode import models
-from flask import request, jsonify
+from flask import request
 from flask_restful import Resource
+from flask_restful import reqparse
 from projectCode.utils.common import errorRetult
 import re
 from projectCode.utils.token_tool import createAutnToken, loginValidation
@@ -11,6 +13,7 @@ from projectCode.utils.token_tool import createAutnToken, loginValidation
 
 @userFunc.route("/login/", methods=['POST'])
 def login():
+    """实现登录"""
     name = request.form["username"]
     pwd = request.form['password']
 
@@ -81,3 +84,52 @@ registerApi.add_resource(Register, "/register/", endpoint="register")
 @loginValidation
 def TestToken():
     return errorRetult(10000)
+
+
+@userFunc.route('/roleInfo/')
+def roleInfo():
+    try:
+        id = int(request.args.get("id").strip())
+        userdb = models.User.query.filter_by(id=id).first()
+        if userdb:
+            return errorRetult(status=10000, data=userdb.__repr__())
+        else:
+            return errorRetult(status=20001, message='查询数据为空')
+    except Exception as e:
+        print(e)
+        return errorRetult(20002)
+
+
+class UserList(Resource):
+    def get(self):
+        """
+        query: 查询对象
+        pnum: 当前第几页
+        pnumsize: 一页多少数量
+        """
+        params = reqparse.RequestParser()
+        params.add_argument('query', type=str)
+        params.add_argument('pnum', type=int)
+        params.add_argument('pnumsize', type=int)
+
+        try:
+            args = params.parse_args()
+            query = args.get('query')
+            pnum = args.get('pnum') if args.get('pnum') else 1
+            pnumsize = args.get('pnumsize') if args.get('pnum') else 2
+            if query:
+                userdb = models.User.query.filter(
+                    models.User.name.like(f'%{query}%')).paginate(pnum, pnumsize)
+            else:
+                userdb = models.User.query.paginate(pnum, pnumsize)
+            userDB = {
+                'pnum': pnum,
+                'totapage': userdb.total,
+                'userlist': [u.__repr__() for u in userdb.items]
+            }
+            return errorRetult(status=10000, data=userDB)
+        except Exception as e:
+            return errorRetult(20002)
+
+
+registerApi.add_resource(UserList, '/user_list/')
