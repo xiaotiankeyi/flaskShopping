@@ -7,4 +7,8 @@ registerApi = Api(userFunc)
 
 
 """引用视图,让视图起作用"""
-from projectCode.user import view_user
+from projectCode.user import view_login
+from projectCode.user import view_register
+from projectCode.user import view_findRole
+from projectCode.user import view_alterRole
+from projectCode.user import view_deleteRole

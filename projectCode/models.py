@@ -37,7 +37,7 @@ class User(db.Model, BaseModel):
         """用户登录后,进行和加密后的密码进行对照"""
         return check_password_hash(self.pwd, pwd_v)
 
-    def __repr__(self):
+    def result_dict(self):
         return {
             "id": self.id,
             "name": self.name,
