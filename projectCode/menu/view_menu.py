@@ -10,6 +10,7 @@ from projectCode.utils.common import errorRetult
 class MenuHandle(Resource):
     def get(self):
         type_ = request.args.get("type")
+        print('aa', type_, request.form, request.args)
         menuList = []
         if type_ == "list":
             dataMenu = models.Menu.query.filter(models.Menu.Level != 0).all()

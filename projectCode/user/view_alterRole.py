@@ -3,38 +3,32 @@ from projectCode import db
 from projectCode import models
 from flask import request
 from projectCode.utils.common import errorRetult
+import re
+"""编辑蓝图,put请求会自动转为json数据格式"""
 
-"""编辑蓝图"""
 
-
-@userFunc.route("/alterUser/", methods=['post'])
+@userFunc.route("/alterUser/", methods=['put'])
 def alterUser():
     """修改用户数据"""
     try:
-        id = int(request.form.get('id').strip())
-        name = request.form.get('name').strip(
-        ) if request.form.get('name') else ''
-        pwd = request.form.get('pwd').strip(
-        ) if request.form.get('pwd') else ''
-        phone = request.form.get('phone').strip(
-        ) if request.form.get('phone') else ''
-        email = request.form.get('email').strip(
-        ) if request.form.get('email') else ''
-        address = request.form.get('address').strip(
-        ) if request.form.get('address') else ''
+        id = int(request.json.get('id'))
+        phone = request.json.get('phone').strip()
+        email = request.json.get('email').strip()
+        address = request.json.get('address').strip()
+
+        rePhone = r"^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$"
+        reEmail = r"^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$"
 
         alterdb = models.User.query.get(id)
         if alterdb:
-            if name:
-                alterdb.name = name
-            elif pwd:
-                alterdb.password = pwd
-            elif phone:
-                alterdb.phone = phone
-            elif email:
-                alterdb.email = email
-            elif address:
-                alterdb.address = address
+            if not re.match(rePhone, phone):
+                return errorRetult(20002)
+            if not re.match(reEmail, email):
+                return errorRetult(20002)
+
+            alterdb.email = email
+            alterdb.phone = phone
+            alterdb.address = address
             db.session.commit()
             return errorRetult(status=10000, message='数据修改成功')
         else:

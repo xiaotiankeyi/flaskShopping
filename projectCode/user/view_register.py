@@ -36,13 +36,13 @@ class Register(Resource):
             address = request.form['address']
 
         rePhone = r"^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$"
-        reEmail = r"^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$"
+        reEmail = r"^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$"
 
-        if not all([name, pwd, phone, email, address]):
+        if not all([name, pwd, assertPwd, phone, email, address]):
             return errorRetult(status=20003)
-        if len(name) < 2:
+        if len(name) < 2 or len(name) > 20:
             return errorRetult(status=10011)
-        if len(pwd) < 6:
+        if len(pwd) < 6 or len(pwd) > 16:
             return errorRetult(status=10021)
         if assertPwd != pwd:
             return errorRetult(status=10022)

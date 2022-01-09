@@ -12,3 +12,4 @@ from projectCode.user import view_register
 from projectCode.user import view_findRole
 from projectCode.user import view_alterRole
 from projectCode.user import view_deleteRole
+from projectCode.user import view_alterPwd
