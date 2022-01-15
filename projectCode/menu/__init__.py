@@ -8,3 +8,4 @@ menuApi = Api(menuFunc)
 
 """引用视图,让视图起作用"""
 from projectCode.menu.view_menu import MenuHandle
+from projectCode.menu import view_rolelist

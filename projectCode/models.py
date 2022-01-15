@@ -1,4 +1,8 @@
 from datetime import datetime
+from msilib import Table
+from pickle import TRUE
+from typing_extensions import Self
+from sqlalchemy.orm import backref
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -22,6 +26,9 @@ class User(db.Model, BaseModel):
     email = db.Column(db.String(32))
     address = db.Column(db.String(32))
 
+    # 建立和角色的一对多关系
+    role_id = db.Column(db.Integer, db.ForeignKey('t_role.id'))
+
     """模型中密码的优化处理"""
 
     @property
@@ -44,7 +51,19 @@ class User(db.Model, BaseModel):
             "phone": self.phone,
             "email": self.email,
             "address": self.address,
+            "role_name": self.role.name if self.role else None
         }
+
+
+# 创建菜单列表和role的多对多关系
+roleMenu = db.Table(
+    't_rolemenu',
+    db.Column('id', db.Integer, primary_key=True, autoincrement=True),
+    db.Column('role_id', db.Integer, db.ForeignKey(
+        't_role.id'), primary_key=True),
+    db.Column('menu_id', db.Integer, db.ForeignKey(
+        't_meun.id'), primary_key=True)
+)
 
 
 class Menu(db.Model):
@@ -53,9 +72,13 @@ class Menu(db.Model):
     name = db.Column(db.String(32), unique=True, nullable=False)
     Level = db.Column(db.Integer)
     parentLevel = db.Column(db.Integer, db.ForeignKey('t_meun.id'))
-
     path = db.Column(db.String(32))
+
+    # 自关联
     subLevel = db.relationship("Menu")
+
+    # 查看谁关联我
+    # roles = db.relationship('Role', secondary=roleMenu)
 
     def result_dict(self):
         return {
@@ -67,8 +90,50 @@ class Menu(db.Model):
         }
 
     def get_subLevel(self):
-        obj_subLevel = self.subLevel
-        dataList = []
-        for val in obj_subLevel:
-            dataList.append(val.result_dict)
-        return dataList
+        for val in self.subLevel:
+            return val.result_dict()
+        return self.result_dict()
+
+
+class Role(db.Model):
+    __tablename__ = "t_role"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(32), unique=True, nullable=False)
+    desc = db.Column(db.String(32))
+
+    user = db.relationship('User', backref='role')
+    # 角色查看相关菜单
+    menus = db.relationship('Menu', secondary=roleMenu)
+
+    def result_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "desc": self.desc,
+            "menus": self.getMenulit()
+        }
+
+    def getMenulit(self):
+        # menuslist = []
+        # if self.menus:
+        #     for val in self.menus:
+        #         if val.Level == 1:
+        #             frist_dict = val.get_subLevel()
+        #             menuslist.append(frist_dict[0])
+        #         if val.Level == 2:
+        #             pass
+        #     return menuslist
+        # return menuslist
+        menuslist = []
+        if self.menus:
+            for val in self.menus:
+                if val.Level == 1:
+                    frist_dict = val.result_dict()
+
+                    frist_dict['subLevel'] = []
+                    # 重新对所有menus循环,查找出属于上个val的下级
+                    for i in self.menus:
+                        if i.Level == 2 and i.parentLevel == val.id:
+                            frist_dict['subLevel'].append(i.get_subLevel())
+                    menuslist.append(frist_dict)
+        return menuslist
