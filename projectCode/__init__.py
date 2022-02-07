@@ -24,6 +24,9 @@ def create(config_Key):
     from projectCode.menu import menuFunc
     app.register_blueprint(menuFunc)
 
+    from projectCode.goodsSystem import goodsSystem
+    app.register_blueprint(goodsSystem)
+
     @app.route('/')
     def hello_world():
         return 'Hello World!'

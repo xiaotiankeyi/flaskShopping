@@ -1,6 +1,5 @@
 from datetime import datetime
-from msilib import Table
-from pickle import TRUE
+from email.policy import default
 from typing_extensions import Self
 from sqlalchemy.orm import backref
 
@@ -77,9 +76,6 @@ class Menu(db.Model):
     # 自关联
     subLevel = db.relationship("Menu")
 
-    # 查看谁关联我
-    # roles = db.relationship('Role', secondary=roleMenu)
-
     def result_dict(self):
         return {
             "id": self.id,
@@ -114,26 +110,120 @@ class Role(db.Model):
         }
 
     def getMenulit(self):
-        # menuslist = []
-        # if self.menus:
-        #     for val in self.menus:
-        #         if val.Level == 1:
-        #             frist_dict = val.get_subLevel()
-        #             menuslist.append(frist_dict[0])
-        #         if val.Level == 2:
-        #             pass
-        #     return menuslist
-        # return menuslist
         menuslist = []
+
         if self.menus:
-            for val in self.menus:
+            menus = sorted(self.menus, key=lambda x: x.id, reverse=False)
+            for val in menus:
                 if val.Level == 1:
                     frist_dict = val.result_dict()
 
                     frist_dict['subLevel'] = []
                     # 重新对所有menus循环,查找出属于上个val的下级
-                    for i in self.menus:
+                    for i in menus:
                         if i.Level == 2 and i.parentLevel == val.id:
                             frist_dict['subLevel'].append(i.get_subLevel())
                     menuslist.append(frist_dict)
         return menuslist
+
+
+class Goodsify(db.Model):
+    """商品分类模型"""
+    __tablename__ = "t_goodsify"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(32), unique=True, nullable=False)
+    level = db.Column(db.Integer, default=1)
+
+    goodsObj = db.relationship('goodsList', backref=db.backref('goodsify'))
+
+    def retult(self, level=3):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "level": self.level,
+            "child_node": self.goodslistdata(level)
+        }
+
+    def goodslistdata(self, level):
+        """获取子节点数据, 根据前端返回回去层级"""
+
+        datalist = []
+        if level == 3:
+            goodsdata = self.goodsObj
+            if goodsdata:
+                for val in goodsdata:
+                    datalist.append(val.retult())
+                return datalist
+            return datalist
+        if level == 2:
+            goodsdata = self.goodsObj
+            if goodsdata:
+                for val in goodsdata:
+                    datalist.append(val.now_retult())
+                return datalist
+            return datalist
+
+        if level == 1:
+            return datalist
+
+
+class goodsList(db.Model):
+    """商品详细品种"""
+    __tablename__ = "t_goodslist"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(32), unique=True, nullable=False)
+    level = db.Column(db.Integer)
+
+    goodsify_id = db.Column(db.Integer, db.ForeignKey('t_goodsify.id'))
+
+    goods = db.relationship('Goods', backref=db.backref('goodslist'))
+
+    def retult(self):
+        """获取当前成和下一层"""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "level": self.level,
+            "goodsify_id": self.goodsify_id,
+            "child_node": self.goodsdata()
+        }
+
+    def goodsdata(self):
+        """获取子节点数据"""
+        datalist = []
+        goodsdata = self.goods
+        if goodsdata:
+            for val in goodsdata:
+                datalist.append(val.retult())
+            return datalist
+        return datalist
+
+    def now_retult(self):
+        """只获取当前"""
+        return {
+            "id": self.id,
+            "name": self.name,
+            "level": self.level,
+            "goodsify_id": self.goodsify_id,
+        }
+
+
+class Goods(db.Model):
+    """具体商品"""
+    __tablename__ = "t_goods"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(32), nullable=False)
+    level = db.Column(db.Integer)
+
+    goodlist_id = db.Column(db.Integer, db.ForeignKey('t_goodslist.id'))
+
+    def retult(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "level": self.level,
+            "goodlist_id": self.goodlist_id
+        }
