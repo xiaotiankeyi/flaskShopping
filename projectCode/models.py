@@ -216,7 +216,10 @@ class Goods(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(32), nullable=False)
+    info = db.Column(db.String(32))
     level = db.Column(db.Integer)
+    pirce = db.Column(db.Integer)
+    repertory = db.Column(db.Integer)
 
     goodlist_id = db.Column(db.Integer, db.ForeignKey('t_goodslist.id'))
 
@@ -225,5 +228,8 @@ class Goods(db.Model):
             "id": self.id,
             "name": self.name,
             "level": self.level,
+            "info": self.info,
+            "pirce": self.pirce,
+            "repertory": self.repertory,
             "goodlist_id": self.goodlist_id
         }

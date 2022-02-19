@@ -43,7 +43,7 @@ class UserList(Resource):
             pnumsize = args.get('pnumsize') if args.get('pnum') else 3
 
             if query:
-                """实现模式查询"""
+                """实现模糊查询"""
                 userdb = models.User.query.filter(
                     models.User.name.like(f'%{query}%')).paginate(pnum, pnumsize)
             else:

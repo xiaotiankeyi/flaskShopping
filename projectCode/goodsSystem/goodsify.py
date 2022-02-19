@@ -7,7 +7,7 @@ from projectCode.utils.common import errorRetult
 
 @goodsSystem.route("/addgoodsify/", methods=['post'])
 def addgoodsify():
-    """增加商品种类"""
+    """增加商品种类,通过判断level来实现增加的类型"""
     try:
         name = request.form.get("name")
         level = request.form.get("level")
@@ -37,11 +37,12 @@ def addgoodsify():
 def findgoodsify():
     """获取商品种类"""
     try:
+        # 指定查询分类id或是所有
         find = request.args.get("find")
         level = request.args.get("level") if request.args.get("level") else 3
 
         if level.isdigit:
-            """对等级进行判断"""
+            """对level进行判断以获取数据的深度"""
             if int(level) in [1, 2, 3]:
                 level = level
 
@@ -70,7 +71,7 @@ def dropgoodsify():
             if data:
                 db.session.remove(data)
                 db.session.commit()
-                return errorRetult(10000, message='查询商品种类成功', data=data.retult())
+                return errorRetult(10000, message='删除商品种类成功', data=data.retult())
         return errorRetult(20000, message='传入数据错误')
     except Exception as e:
         return errorRetult(20000, message=e)
