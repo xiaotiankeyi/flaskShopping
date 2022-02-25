@@ -25,8 +25,8 @@ def addgoodsify():
             if level.isdigit() and int(level) == 3:
                 data = models.Goods(name=name, level=3, goodlist_id=int(parentlevel))
 
-            db.session.add(data)
-            db.session.commit()
+            # db.session.add(data)
+            # db.session.commit()
             return errorRetult(10000, message='添加商品种类成功')
         return errorRetult(20000, message='传入数据错误')
     except Exception as e:

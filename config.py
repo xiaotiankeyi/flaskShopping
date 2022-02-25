@@ -1,3 +1,4 @@
+from ast import Set
 import os
 
 
@@ -13,6 +14,10 @@ class Config():
     # 对app进行SqlAlchemy配置
     SQLALCHEMY_DATABASE_URI = DB_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    ALLOWED_IMG = set(['pag', 'jpg', 'jpeg', 'gif'])
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    SERVER_IMG_UPLOADS = os.path.join(BASE_DIR, 'projectCode', 'static', 'img')
 
 
 class DevelopmentMode(Config):
