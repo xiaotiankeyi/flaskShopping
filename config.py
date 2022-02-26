@@ -4,10 +4,10 @@ import os
 
 class Config():
     """基础数据库配置"""
-    HOST = '192.168.0.121'
+    HOST = '127.0.0.1'
     PORT = '3306'
     DATA_BASE = 'flaskShopping'
-    USER = 'mysql'
+    USER = 'root'
     PWD = '123456'
     DB_URL = f'mysql+pymysql://{USER}:{PWD}@{HOST}:{PORT}/{DATA_BASE}?charset=utf8'
 

@@ -2,5 +2,7 @@
 .idea/
 .DS_Store
 .vscode
+migrations
 __pycache__
 *./__pycache__
+
