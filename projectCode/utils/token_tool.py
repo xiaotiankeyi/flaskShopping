@@ -5,7 +5,6 @@
 3、秘钥
 """
 
-
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, request
 from projectCode.models import User
@@ -29,14 +28,17 @@ def tokenTime():
 
 def createAutnToken(IDvalue):
     """生成token,IDvalue用户id,timeValidity有效期"""
+    v = current_app.config['SECRET_KEY']
+    print('上下文配置值', v, type(v))
     condingObj = Serializer(
-        current_app.config['SECRET_KEY'], 100)
+        current_app.config['SECRET_KEY'], expires_in=100)
 
     return condingObj.dumps({"id": IDvalue}).decode()
 
 
 def decodeAutnToken(tokenValue):
     """解码用户传送过来的token"""
+
     decodeObj = Serializer(current_app.config['SECRET_KEY'])
 
     try:
@@ -55,13 +57,16 @@ def loginValidation(viewFunc):
         except Exception:
             # 没有接收到token,返回30000
             return errorRetult(30000)
+        print('上下文配置值', current_app.config['SECRET_KEY'])
 
         decodeObj = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = decodeObj.loads(tokenVal)
-        except Exception:
+            # print(data)
+        except Exception as e:
+            print('=======', e)
             # 对token进行解析,错误就返回30001
             return errorRetult(30001)
-        return viewFunc(*args, **kwargs)
+        return viewFunc()
 
     return tokenValidation

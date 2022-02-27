@@ -15,7 +15,7 @@ class Config():
     SQLALCHEMY_DATABASE_URI = DB_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    ALLOWED_IMG = set(['pag', 'jpg', 'jpeg', 'gif'])
+    ALLOWED_IMG = set(['png', 'jpg', 'jpeg', 'gif'])
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     SERVER_IMG_UPLOADS = os.path.join(BASE_DIR, 'projectCode', 'static', 'img')
 
@@ -34,6 +34,7 @@ class DevelopmentMode(Config):
 
     # 秘钥
     SECRET_KEY = os.urandom(12)
+    # SECRET_KEY = '123456'
 
 
 class ProductionModels(Config):
