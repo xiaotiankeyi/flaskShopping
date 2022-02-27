@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_migrate import Migrate
 from config import configDict
 
 db = SQLAlchemy()
@@ -16,6 +16,8 @@ def create(config_Key):
 
     # 防止在把app传回来,在这先绑定app对象
     db.init_app(app=app)
+    """执行前先导入模型"""
+    Migrate(app=app, db=db)
 
     """蓝图注册必须是app对象和db对象创建后初始化完成后才注册"""
     from projectCode.user import userFunc

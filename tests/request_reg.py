@@ -1,4 +1,5 @@
 import random
+from traceback import print_tb
 
 import requests
 
@@ -35,11 +36,15 @@ def objReg():
         number += 1
         print(res.json(), number)
 
+string = 'hello, world'
+
 if __name__ == "__main__":
     # objTest()
-    objReg()
+    # objReg()
     # num =int('181' + ''.join(i for i in random.sample('0123456789', 8)))
     # print(type(num))
     #
     # address = random.sample(['江西', '福建', '广东', '四川', '湖南', '浙江', '河北'], 1)[0]
     # print(address)
+    print(string.rsplit(',', 1))
+    print(string.split(',', 1))
